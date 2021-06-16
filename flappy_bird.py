@@ -3,24 +3,24 @@ import turtle, time, random
 window = turtle.Screen()
 canvas = window.getcanvas()
 root = canvas.winfo_toplevel()
-window.title('Flappy Bird')
-window.bgcolor('blue')
+window.title('Moor')
+window.bgcolor('black')
 window.bgpic('background.gif')
-window.setup(width=500, height=700)
+window.setup(width=1900, height=1070)
 window.tracer(0)
 
 window.register_shape('bird.gif')
 
 bird = turtle.Turtle()
 bird.speed(0)
-bird.color('yellow')
+bird.color('white')
 bird.shape('bird.gif')
 bird.penup()
 bird.goto(-180, 0)
 bird.dx = 0
 bird.dy = 1
 
-score = 100
+score = 0
 score_board = turtle.Turtle()
 score_board.speed(0)
 score_board.color('white')
@@ -39,8 +39,9 @@ def bird_up(x, y):
         bird.dy = 8
 
 def close():
-    global devam
-    devam = False
+    global continuation
+    continuation = False
+
 
 pipes = []
 window.listen()
@@ -53,9 +54,10 @@ while continuation:
     time.sleep(0.02)
     window.update()
 
+
     bird.dy = bird.dy + gravity
 
-    if (time.time() - starting_time > random.randint(5, 15)):
+    if (time.time() - starting_time > random.randint(1, 15)):
         starting_time = time.time()
         pipe_up = turtle.Turtle()
         pipe_up.speed(0)
@@ -64,7 +66,7 @@ while continuation:
         pipe_up.h = random.randint(10, 20)
         pipe_up.shapesize(pipe_up.h, 2, outline=None)
         pipe_up.penup()
-        pipe_up.goto(300, 250)
+        pipe_up.goto(300, 250) # aradaki sıklık değişiyor
         pipe_up.dx = -2
         pipe_up.dy = 0
 
@@ -76,7 +78,7 @@ while continuation:
         pipe_down.shapesize(pipe_down.h, 2, outline=None)
         pipe_down.penup()
         pipe_down.goto(300, -250)
-        pipe_down.dx = -2
+        pipe_down.dx = -2 # hız değişiyor
         pipe_down.dy = 0
 
         pipes.append((pipe_up, pipe_down))
@@ -88,22 +90,31 @@ while continuation:
 
     if len(pipes) > 0:
         for pipe in pipes:
-            x = pipe[0].xcor()
+            x = pipe[0].xcor() # işi biten boruları siliyor
             x = x + pipe[0].dx
             pipe[0].setx(x)
             x = pipe[1].xcor()
             x = x + pipe[1].dx
             pipe[1].setx(x)
-            if pipe[0].xcor() < -300:
+            if pipe[0].xcor() < -700:
                 pipe[0].hideturtle()
                 pipe[1].hideturtle()
                 pipes.pop(pipes.index((pipe)))
-            if (bird.xcor()+10>pipe[0].xcor()-20) and (bird.xcor()-10<pipe[0].xcor()+20):
+            if (bird.xcor()+10>pipe[0].xcor()-20) and (bird.xcor()-10<pipe[0].xcor()+20): # kuşun (topun) borulara çarpma durumu inceleniyor
                 if (bird.ycor()+10>pipe[0].ycor()-pipe[0].h*10) or (bird.ycor()-10<pipe[1].ycor()+pipe[1].h*10):
                     score = score - 1
+                    score_board.clear()
+                    score_board.write('Score: {}'.format(score), align='center', font=('Courier', 24, 'bold'))
+                else:
+                    score = score + 1
                     score_board.clear()
                     score_board.write('Score: {}'.format(score), align='center', font=('Courier', 24, 'bold'))
 
     if score< 0:
         score_board.clear()
         score_board.write('You Lost!', align='center', font=('Courier', 24, 'bold'))
+        bird.dy = bird.dy - 2
+        bird.dy = bird.dy - 4
+        bird.dy = bird.dy - 2
+        time.sleep(1)
+        break
